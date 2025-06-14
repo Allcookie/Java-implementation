@@ -2,21 +2,16 @@ package com.example.springproject;
 
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
+
+// 建立Spring時，Dependencies choose Spring Web
+// .\gradlew.bat bootRun 在 http://localhost:8080/hello 做測試
 
 @SpringBootApplication
-@RestController
-// .\gradlew.bat bootRun // 測試
 public class SpringprojectApplication {
 
 	public static void main(String[] args) {
 		SpringApplication.run(SpringprojectApplication.class, args);
+		System.out.println("Completeee??");
 	}
-	@GetMapping("/hello")
-    public String hello(@RequestParam(value = "name", defaultValue = "Guest") String name) {
-      return String.format("Hello %s!!", name);
-    }
 	
 }
