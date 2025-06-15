@@ -18,14 +18,14 @@ public class UserController {
         System.out
                 .println("收到註冊資料：" + request.getUserName() + ", " + request.getEmail() + ", " + request.getPassword());
         userService.register(request.getUserName(), request.getEmail(), request.getPassword(), request.getCoverImage(),
-                request.getBiography());
+                request.getBiography(), request.getPhoneNumber());
         return "User registered successfully!";
     }
 
     @PostMapping("/login")
     public String login(@RequestBody LoginRequest request) {
         System.out.println("登入中");
-        String token = userService.login(request.getEmail(), request.getPassword());
+        String token = userService.login(request.getPhoneNumber(), request.getPassword());
         return token;
     }
 

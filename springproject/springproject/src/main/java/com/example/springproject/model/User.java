@@ -11,4 +11,5 @@ public class User {
     private String salt;
     private String coverImage;
     private String biography;
+    private String phoneNumber;
 }

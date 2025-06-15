@@ -14,6 +14,7 @@ public class UserRepository {
 
     private final SimpleJdbcCall registerUserCall;
     private final SimpleJdbcCall findUserByEmailCall;
+    private final SimpleJdbcCall findUserByPhoneCall;
 
     // 註冊
     @Autowired
@@ -22,6 +23,19 @@ public class UserRepository {
                 .withProcedureName("sp_register_user");
         this.findUserByEmailCall = new SimpleJdbcCall(dataSource)
                 .withProcedureName("sp_find_user_by_email")
+                .returningResultSet("user", (rs, rowNum) -> {
+                    User user = new User();
+                    user.setUserId(rs.getInt("user_id"));
+                    user.setUserName(rs.getString("user_name"));
+                    user.setEmail(rs.getString("email"));
+                    user.setPasswordHash(rs.getString("password_hash"));
+                    user.setSalt(rs.getString("salt"));
+                    user.setCoverImage(rs.getString("cover_image"));
+                    user.setBiography(rs.getString("biography"));
+                    return user;
+                });
+        this.findUserByPhoneCall = new SimpleJdbcCall(dataSource)
+                .withProcedureName("sp_find_user_by_phone")
                 .returningResultSet("user", (rs, rowNum) -> {
                     User user = new User();
                     user.setUserId(rs.getInt("user_id"));
@@ -43,11 +57,12 @@ public class UserRepository {
         params.put("p_salt", user.getSalt());
         params.put("p_cover_image", user.getCoverImage());
         params.put("p_biography", user.getBiography());
+        params.put("p_phone_number", user.getPhoneNumber());
 
         registerUserCall.execute(params);
     }
 
-    // 尋找Email 用於登入
+    // 尋找Email
     public User findUserByEmail(String email) {
         Map<String, Object> params = new HashMap<>();
         params.put("p_email", email);
@@ -56,6 +71,16 @@ public class UserRepository {
         // @SuppressWarnings("unchecked")
         var users = (List<User>) result.get("user");
 
+        return users.isEmpty() ? null : users.get(0);
+    }
+
+    // 尋找手機號碼 用於登入
+    public User findUserByPhone(String phoneNumber) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("p_phone_number", phoneNumber);
+        Map<String, Object> result = findUserByPhoneCall.execute(params);
+        var users = (List<User>) result.get("user");
+        
         return users.isEmpty() ? null : users.get(0);
     }
 }

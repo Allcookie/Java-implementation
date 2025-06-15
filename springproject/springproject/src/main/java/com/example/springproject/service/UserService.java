@@ -19,7 +19,8 @@ public class UserService {
         this.userRepository = userRepository;
     }
 
-    public void register(String userName, String email, String password, String coverImage, String biography) {
+    public void register(String userName, String email, String password, String coverImage, String biography,
+            String phoneNumber) {
         String salt = generateSalt();
         String hashedPassword = hashPassword(password, salt);
 
@@ -30,6 +31,7 @@ public class UserService {
         user.setPasswordHash(hashedPassword);
         user.setCoverImage(coverImage);
         user.setBiography(biography);
+        user.setPhoneNumber(phoneNumber);
 
         userRepository.registerUser(user);
     }
@@ -55,10 +57,10 @@ public class UserService {
     @Autowired
     private JwtUtil jwtUtil;
 
-    public String login(String email, String password) {
-        System.out.println("進入 login : " + email);
+    public String login(String phoneNumber, String password) {
+        System.out.println("進入 login : " + phoneNumber);
 
-        User user = userRepository.findUserByEmail(email);
+        User user = userRepository.findUserByPhone(phoneNumber);
         if (user == null) {
             throw new RuntimeException("使用者不存在");
         }
@@ -69,6 +71,6 @@ public class UserService {
         }
 
         // 驗證通過，回傳 JWT
-        return jwtUtil.generateToken(email);
+        return jwtUtil.generateToken(phoneNumber);
     }
 }
