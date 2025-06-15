@@ -15,18 +15,18 @@ public class JwtUtil {
     private final Key key = Keys.secretKeyFor(SignatureAlgorithm.HS256);
 
     // 建立 JWT
-    public String generateToken(String email) {
+    public String generateToken(String phoneNumber) {
         long expirationMs = 1000 * 60 * 60 * 2; // 2 小時
         return Jwts.builder()
-                .setSubject(email)
+                .setSubject(phoneNumber)
                 .setIssuedAt(new Date())
                 .setExpiration(new Date(System.currentTimeMillis() + expirationMs))
                 .signWith(key)
                 .compact();
     }
 
-    // 解析 Token 取得 Email
-    public String extractEmail(String token) {
+    // 解析 Token 取得 Phone
+    public String extractPhone(String token) {
         return Jwts.parserBuilder()
                 .setSigningKey(key)
                 .build()
