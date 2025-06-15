@@ -1,4 +1,12 @@
 <template>
+  <router-view />
+</template>
+
+<!-- <script setup>
+import Login from './views/Login.vue'
+</script> -->
+
+<!-- <template>
   <header>
     <img alt="Vue logo" class="logo" src="@/assets/logo.svg" width="125" height="125" />
   </header>
@@ -51,4 +59,4 @@ body {
     margin-top: 1rem;
   }
 }
-</style>
+</style> -->
