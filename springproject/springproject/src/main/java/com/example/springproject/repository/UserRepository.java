@@ -7,16 +7,32 @@ import org.springframework.stereotype.Repository;
 import javax.sql.DataSource;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.List;
 
 @Repository
 public class UserRepository {
 
-    private final SimpleJdbcCall jdbcCall;
+    private final SimpleJdbcCall registerUserCall;
+    private final SimpleJdbcCall findUserByEmailCall;
 
+    // 註冊
     @Autowired
     public UserRepository(DataSource dataSource) {
-        this.jdbcCall = new SimpleJdbcCall(dataSource)
+        this.registerUserCall = new SimpleJdbcCall(dataSource)
                 .withProcedureName("sp_register_user");
+        this.findUserByEmailCall = new SimpleJdbcCall(dataSource)
+                .withProcedureName("sp_find_user_by_email")
+                .returningResultSet("user", (rs, rowNum) -> {
+                    User user = new User();
+                    user.setUserId(rs.getInt("user_id"));
+                    user.setUserName(rs.getString("user_name"));
+                    user.setEmail(rs.getString("email"));
+                    user.setPasswordHash(rs.getString("password_hash"));
+                    user.setSalt(rs.getString("salt"));
+                    user.setCoverImage(rs.getString("cover_image"));
+                    user.setBiography(rs.getString("biography"));
+                    return user;
+                });
     }
 
     public void registerUser(User user) {
@@ -28,6 +44,18 @@ public class UserRepository {
         params.put("p_cover_image", user.getCoverImage());
         params.put("p_biography", user.getBiography());
 
-        jdbcCall.execute(params);
+        registerUserCall.execute(params);
+    }
+
+    // 尋找Email 用於登入
+    public User findUserByEmail(String email) {
+        Map<String, Object> params = new HashMap<>();
+        params.put("p_email", email);
+        Map<String, Object> result = findUserByEmailCall.execute(params);
+
+        // @SuppressWarnings("unchecked")
+        var users = (List<User>) result.get("user");
+
+        return users.isEmpty() ? null : users.get(0);
     }
 }

@@ -2,7 +2,9 @@ package com.example.springproject.service;
 
 import com.example.springproject.model.User;
 import com.example.springproject.repository.UserRepository;
+import com.example.springproject.util.JwtUtil;
 import org.springframework.stereotype.Service;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import java.security.MessageDigest;
 import java.security.SecureRandom;
@@ -10,7 +12,7 @@ import java.util.Base64;
 
 @Service
 public class UserService {
-
+    // ======註冊 & 密碼加鹽 & 雜湊======
     private final UserRepository userRepository;
 
     public UserService(UserRepository userRepository) {
@@ -47,5 +49,26 @@ public class UserService {
         } catch (Exception e) {
             throw new RuntimeException("Error hashing password", e);
         }
+    }
+
+    // ======登入 & Jwt驗證======
+    @Autowired
+    private JwtUtil jwtUtil;
+
+    public String login(String email, String password) {
+        System.out.println("進入 login : " + email);
+
+        User user = userRepository.findUserByEmail(email);
+        if (user == null) {
+            throw new RuntimeException("使用者不存在");
+        }
+
+        String hashedInput = hashPassword(password, user.getSalt());
+        if (!hashedInput.equals(user.getPasswordHash())) {
+            throw new RuntimeException("密碼錯誤");
+        }
+
+        // 驗證通過，回傳 JWT
+        return jwtUtil.generateToken(email);
     }
 }

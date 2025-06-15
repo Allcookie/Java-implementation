@@ -14,9 +14,10 @@ public class SecurityConfig {
         http
             .csrf(csrf -> csrf.disable()) // 關閉 CSRF，方便 Postman 測試
             .authorizeHttpRequests(auth -> auth
-                .requestMatchers("/api/register").permitAll()  // 允許訪問 /api/register
+                .requestMatchers("/api/register", "/api/login").permitAll()  // 允許訪問 register & login
                 .anyRequest().authenticated()                 // 其他路徑都需要登入
             )
+            .formLogin(form -> form.disable())
             .httpBasic(Customizer.withDefaults()); // 暫時開啟基本驗證（開發用）
 
         return http.build();
